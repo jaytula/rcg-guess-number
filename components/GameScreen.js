@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, StyleSheet, FlatList, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import NumberContainer from "./NumberContainer";
@@ -20,10 +20,10 @@ const generateRandomBetween = (min, max, exclude) => {
   }
 };
 
-const renderListItem = (value, numOfRound) => (
-  <View key={value} style={styles.listItem}>
-    <BodyText>#{numOfRound}</BodyText>
-    <BodyText>{value}</BodyText>
+const renderListItem = ({ item, index }, numOfRound) => (
+  <View style={styles.listItem}>
+    <BodyText>#{numOfRound - index}</BodyText>
+    <BodyText>{item}</BodyText>
   </View>
 );
 
@@ -31,7 +31,7 @@ const GameScreen = props => {
   const initialGuess = generateRandomBetween(1, 100, props.userChoice);
 
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
-  const [pastGuesses, setPastGuesses] = useState([initialGuess, 38, 47, 52]);
+  const [pastGuesses, setPastGuesses] = useState([initialGuess]);
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
@@ -81,12 +81,13 @@ const GameScreen = props => {
           <Ionicons name="md-add" size={24} color="white" />
         </MainButton>
       </Card>
-      <View style={styles.list}>
-        <ScrollView>
-          {pastGuesses.map((guess, index) =>
-            renderListItem(guess, pastGuesses.length - index)
-          )}
-        </ScrollView>
+      <View style={styles.listContainer}>
+        <FlatList
+          contentContainerStyle={styles.list}
+          keyExtractor={item => item.toString()}
+          data={pastGuesses}
+          renderItem={itemData => renderListItem(itemData, pastGuesses.length)}
+        />
       </View>
     </View>
   );
@@ -105,9 +106,14 @@ const styles = StyleSheet.create({
     width: 400,
     maxWidth: "90%"
   },
-  list: {
-    width: "80%",
+  listContainer: {
+    width: "60%",
     flex: 1
+  },
+  list: {
+    //alignItems: "center",
+    justifyContent: "flex-end",
+    flexGrow: 1
   },
   listItem: {
     borderColor: "#ccc",
@@ -116,7 +122,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: "white",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    width: "100%"
   }
 });
 export default GameScreen;

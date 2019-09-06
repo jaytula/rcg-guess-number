@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
-    alignItems: "center"
+    alignItems: "center",
+    paddingVertical: 10
   },
   inputContainer: {
     width: "80%",

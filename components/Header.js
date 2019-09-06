@@ -1,7 +1,8 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 
 import Text from "./TitleText";
+import Colors from "../constants/colors";
 
 const Header = props => {
   const { title } = props;
@@ -20,10 +21,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 90,
     paddingTop: 36,
-    backgroundColor: "#f7287b"
+    backgroundColor: Platform.OS === "android" ? Colors.primary : "white",
+    borderBottomColor: Platform.OS === "android" ? "#ccc" : "transparent",
+    borderBottomWidth: Platform.OS === "android" ? 2 : 0
   },
   text: {
-    color: "white"
+    color: Platform.OS === "android" ? "white" : Colors.primary
   }
 });
 

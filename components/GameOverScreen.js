@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,11 +15,37 @@ import Colors from "../constants/colors";
 import MainButton from "../components/MainButton";
 
 const GameOverScreen = props => {
+  const [windowWidth, setWindowWidth] = useState(
+    Dimensions.get("window").width
+  );
+  const [windowHeight, setWindowHeight] = useState(
+    Dimensions.get("window").height
+  );
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setWindowWidth(Dimensions.get("window").width);
+      setWindowHeight(Dimensions.get("window").height);
+    };
+
+    Dimensions.addEventListener("change", updateLayout);
+
+    return () => Dimensions.removeEventListener("change", updateLayout);
+  });
+
   return (
     <ScrollView>
       <View style={styles.screen}>
         <TitleText>The Game is Over</TitleText>
-        <View style={styles.imageContainer}>
+        <View
+          style={{
+            ...styles.imageContainer,
+            width: windowWidth * 0.7,
+            height: windowWidth * 0.7,
+            borderRadius: windowWidth / 2,
+            marginVertical: windowWidth / 30
+          }}
+        >
           <Image
             style={styles.image}
             resizeMode="cover"
@@ -30,8 +56,18 @@ const GameOverScreen = props => {
             }}*/
           />
         </View>
-        <View style={styles.resultContainer}>
-          <BodyText style={styles.resultText}>
+        <View
+          style={{
+            ...styles.resultContainer,
+            marginVertical: windowHeight / 60
+          }}
+        >
+          <BodyText
+            style={{
+              ...styles.resultText,
+              fontSize: windowHeight < 400 ? 16 : 20
+            }}
+          >
             Your phone needed{" "}
             <Text style={styles.highlight}>{props.rounds}</Text> round to guess
             the number <Text style={styles.highlight}>{props.userNumber}</Text>
@@ -47,27 +83,22 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    paddingVertical: 10
   },
   image: {
     width: "100%",
     height: "100%"
   },
   imageContainer: {
-    width: Dimensions.get("window").width * 0.7,
-    height: Dimensions.get("window").width * 0.7,
-    borderRadius: (Dimensions.get("window").width * 0.7) / 2,
     borderWidth: 3,
     borderColor: "black",
-    overflow: "hidden",
-    marginVertical: Dimensions.get("window").height / 30
+    overflow: "hidden"
   },
   resultContainer: {
-    marginVertical: Dimensions.get("window").height / 60,
     marginHorizontal: 30
   },
   resultText: {
-    fontSize: Dimensions.get("window").height < 400 ? 16 : 20,
     textAlign: "center"
   },
   highlight: {

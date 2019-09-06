@@ -32,6 +32,9 @@ const GameScreen = props => {
 
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [pastGuesses, setPastGuesses] = useState([initialGuess]);
+  const [windowHeight, setWindowHeight] = useState(
+    Dimensions.get("window").height
+  );
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
@@ -43,6 +46,16 @@ const GameScreen = props => {
       onGameOver(pastGuesses.length);
     }
   }, [currentGuess, userChoice, onGameOver]);
+
+  useEffect(() => {
+    const onLayoutChange = () => {
+      setWindowHeight(Dimensions.get("window").height);
+    };
+    Dimensions.addEventListener("change", onLayoutChange);
+    return () => {
+      Dimensions.removeEventListener("change", onLayoutChange);
+    };
+  });
 
   const nextGuessHandler = direction => {
     if (
@@ -68,6 +81,33 @@ const GameScreen = props => {
     setCurrentGuess(nextNumber);
     setPastGuesses(currentPastGuesses => [nextNumber, ...currentPastGuesses]);
   };
+
+  if (windowHeight < 500) {
+    return (
+      <View style={styles.screen}>
+        <BodyText>Opponent&apos;s Guess</BodyText>
+        <View style={styles.control}>
+          <MainButton onPress={() => nextGuessHandler("lower")}>
+            <Ionicons name="md-remove" size={24} color="white" />
+          </MainButton>
+          <NumberContainer>{currentGuess}</NumberContainer>
+          <MainButton onPress={() => nextGuessHandler("greater")}>
+            <Ionicons name="md-add" size={24} color="white" />
+          </MainButton>
+        </View>
+        <View style={styles.listContainer}>
+          <FlatList
+            contentContainerStyle={styles.list}
+            keyExtractor={item => item.toString()}
+            data={pastGuesses}
+            renderItem={itemData =>
+              renderListItem(itemData, pastGuesses.length)
+            }
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen}>
@@ -105,6 +145,12 @@ const styles = StyleSheet.create({
     marginTop: Dimensions.get("window").height > 600 ? 20 : 10,
     width: 400,
     maxWidth: "90%"
+  },
+  control: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "80%"
   },
   listContainer: {
     width: Dimensions.get("window").width > 350 ? "60%" : "80%",
